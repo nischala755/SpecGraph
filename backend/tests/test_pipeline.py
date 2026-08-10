@@ -24,6 +24,7 @@ def test_wrong_fixture_citation_is_unverified():
 
 def test_units_contradiction_and_physics_are_deterministic():
     assert normalize('length',1,'in')==(25.4,'mm',None)
+    assert normalize('length','32','mm')==(32.0,'mm',None)
     assert normalize('power',1,'V')[2]=='unit mismatch for field type'
     source=SourceDocument('x','x.md','manufacturer_datasheet',1)
     a=ExtractedAttribute('power',60,'W','Power: 60 W',source.id);v=ExtractedAttribute('voltage',24,'V','Voltage: 24 V',source.id);i=ExtractedAttribute('current',2,'A','Current: 2 A',source.id)

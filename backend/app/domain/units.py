@@ -1,4 +1,5 @@
 from __future__ import annotations
+import re
 
 CONVERSIONS = {
     "length": {"mm": (1, "mm"), "cm": (10, "mm"), "m": (1000, "mm"), "in": (25.4, "mm"), "inch": (25.4, "mm")},
@@ -12,6 +13,8 @@ CONVERSIONS = {
 }
 
 def normalize(field: str, value: float | str, unit: str | None) -> tuple[float | str, str | None, str | None]:
+    if isinstance(value, str) and field in CONVERSIONS and re.fullmatch(r"[-+]?\d+(?:\.\d+)?", value.strip()):
+        value=float(value)
     if not isinstance(value, (float, int)) or field not in CONVERSIONS: return value, unit, None
     key = (unit or "").strip().lower().replace("³", "3")
     conversion = CONVERSIONS[field].get(key)

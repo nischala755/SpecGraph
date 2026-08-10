@@ -2,6 +2,10 @@ from rapidfuzz import fuzz, process
 from app.domain.models import ExtractedAttribute
 
 def verify(attribute: ExtractedAttribute, chunks: list[str]) -> ExtractedAttribute:
+    for chunk in chunks:
+        if attribute.citation_span in chunk:
+            attribute.verification_score, attribute.citation_verified, attribute.source_context = 100.0, True, chunk
+            return attribute
     match = process.extractOne(attribute.citation_span, chunks, scorer=fuzz.token_sort_ratio)
     score, context = (float(match[1]), match[0]) if match else (0.0, "")
     attribute.verification_score, attribute.citation_verified, attribute.source_context = score, score >= 90, context
