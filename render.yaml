@@ -11,6 +11,8 @@ services:
         sync: false
       - key: NEO4J_PASSWORD
         sync: false
+      - key: NEO4J_DATABASE
+        sync: false
       - key: MISTRAL_API_KEY
         sync: false
       - key: MISTRAL_MODEL

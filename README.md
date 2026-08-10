@@ -58,7 +58,7 @@ The backend suite verifies seed shape, the wrong-citation fixture, explicit conv
 1. Create one AuraDB Free instance and retain its Bolt URI, username, and password.
 2. Push this repository to GitHub.
 3. In Render, create a Blueprint from the repository; it detects `render.yaml`.
-4. Populate `NEO4J_*` and `MISTRAL_API_KEY` as Render secret environment variables.
+4. Populate `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`, and `MISTRAL_API_KEY` as Render secret environment variables.
 5. Deploy, wait for `/health` to report Neo4j connectivity, then reset the demo dataset from the application.
 
 Render’s free web service spins down after idle time, so allow a cold start before a demo. AuraDB and Render credentials are intentionally not included in this repository.
