@@ -1,4 +1,6 @@
 from __future__ import annotations
+import gc
+import os
 import re
 from typing import Callable
 from datasketch import MinHash, MinHashLSH
@@ -10,13 +12,15 @@ def _mh(text: str) -> MinHash:
     m = MinHash(num_perm=64)
     for i in range(max(1, len(text)-2)): m.update(text[i:i+3].encode())
     return m
-_model = None
 def _semantic_scores(candidates: list[Candidate]) -> Callable[[int, int], float]:
     """Local CPU all-MiniLM-L6-v2 inference; invoked only after LSH pruning."""
-    global _model
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     from sentence_transformers import SentenceTransformer
-    _model = _model or SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
-    vectors = _model.encode([f"{c.product_name} {c.category}" for c in candidates], normalize_embeddings=True)
+    model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
+    model.max_seq_length = 64
+    vectors = model.encode([f"{c.product_name} {c.category}" for c in candidates], batch_size=1, normalize_embeddings=True, show_progress_bar=False)
+    del model
+    gc.collect()
     return lambda i, j: float(vectors[i] @ vectors[j])
 def clusters(candidates: list[Candidate], embedding_similarity: Callable[[int, int], float] | None = None) -> tuple[list[list[int]], int]:
     if not candidates: return [], 0

@@ -1,7 +1,9 @@
 from __future__ import annotations
 import os
+import json
+from dataclasses import asdict
 from neo4j import GraphDatabase
-from app.domain.models import Product, SourceDocument, ExtractedAttribute
+from app.domain.models import Product, SourceDocument, ExtractedAttribute, Job, JobDocument
 
 class GraphRepository:
     def __init__(self, uri: str | None = None, username: str | None = None, password: str | None = None):
@@ -19,6 +21,13 @@ class GraphRepository:
             for q in statements: s.run(q)
     def clear(self):
         with self._session() as s: s.run("MATCH (n) DETACH DELETE n")
+    def save_job(self, job: Job):
+        with self._session() as s:
+            s.run("MERGE (j:IngestionJob {id:$id}) SET j.state=$state,j.error=$error,j.documents=$documents", id=job.id, state=job.state, error=job.error, documents=json.dumps([asdict(d) for d in job.documents]))
+    def load_job(self, job_id: str) -> Job | None:
+        with self._session() as s: row=s.run("MATCH (j:IngestionJob {id:$id}) RETURN j", id=job_id).single()
+        if not row: return None
+        node=row["j"]; return Job(id=node["id"], state=node["state"], error=node.get("error"), documents=[JobDocument(**document) for document in json.loads(node["documents"])])
     def save_product(self, product: Product):
         with self._session() as s:
             s.run("MERGE (p:Product {id:$id}) SET p.resolved_name=$name,p.category=$category,p.mpn=$mpn,p.cluster_confidence=$confidence", id=product.id,name=product.resolved_name,category=product.category,mpn=product.mpn,confidence=product.cluster_confidence)

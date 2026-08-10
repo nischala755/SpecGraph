@@ -21,7 +21,7 @@ async def lifespan(app):
     try: repo.initialize()
     except Exception as error: app.state.startup_error=f"Neo4j initialization failed: {error}"
     app.state.repo=repo;app.state.seed_documents=load_seed_documents
-    app.state.jobs=JobManager(IngestionService(repo,provider_for).process);yield;repo.close()
+    app.state.jobs=JobManager(IngestionService(repo,provider_for).process,repo);yield;repo.close()
 app=FastAPI(title='SpecGraph Intelligence Engine',lifespan=lifespan);app.include_router(router)
 @app.get('/health')
 async def health():
