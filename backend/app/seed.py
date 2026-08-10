@@ -8,5 +8,6 @@ def load_seed_documents() -> list[SourceDocument]:
     docs=[]
     for path in sorted(root.rglob('*.md')):
         source_type=next(x for x in TIERS if x in path.name)
-        docs.append(SourceDocument(path.read_text(encoding='utf8'),path.name,source_type,TIERS[source_type]))
+        raw_text=f"Source filename: {path.name}\nSource type: {source_type}\n\n{path.read_text(encoding='utf8')}"
+        docs.append(SourceDocument(raw_text,path.name,source_type,TIERS[source_type]))
     return docs

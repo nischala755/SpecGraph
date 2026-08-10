@@ -14,6 +14,7 @@ def test_seed_dataset_has_exact_source_shape():
     assert len(docs)==54
     assert {d.source_type for d in docs}=={'manufacturer_datasheet','distributor_listing','scraped_page'}
     assert all(d.filename and d.id for d in docs)
+    assert len({d.id for d in docs})==54
 
 def test_wrong_fixture_citation_is_unverified():
     doc=next(d for d in load_seed_documents() if 'wrong_citation_fixture' in d.filename)
