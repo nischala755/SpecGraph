@@ -8,6 +8,14 @@ from rapidfuzz.fuzz import ratio
 from app.domain.models import Candidate
 
 def norm(s: str | None) -> str: return re.sub(r"[\W_]", "", (s or "").lower()).lstrip("0")
+def mpn_similarity(left: str | None, right: str | None) -> float:
+    a,b=norm(left),norm(right)
+    if not a or not b: return 0.0
+    if a==b: return 1.0
+    # A differing numeric identifier denotes a different industrial part even
+    # when the surrounding series name is similar (UC201 vs UC202).
+    if re.findall(r"\d+",a) != re.findall(r"\d+",b): return 0.0
+    return ratio(a,b)/100
 def _mh(text: str) -> MinHash:
     m = MinHash(num_perm=64)
     for i in range(max(1, len(text)-2)): m.update(text[i:i+3].encode())
@@ -45,7 +53,7 @@ def clusters(candidates: list[Candidate], embedding_similarity: Callable[[int, i
             if j<=i: continue
             comparisons+=1; o=candidates[j]
             embed=semantic(i, j)
-            mpn=ratio(norm(c.mpn),norm(o.mpn))/100 if c.mpn and o.mpn else 0
+            mpn=mpn_similarity(c.mpn,o.mpn)
             cat=1 if norm(c.category)==norm(o.category) else 0
             if .55*embed+.30*mpn+.15*cat >= .78: parent[root(i)]=root(j)
     result={}

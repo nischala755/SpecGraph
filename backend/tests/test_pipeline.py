@@ -3,7 +3,7 @@ from app.domain.models import Candidate, ExtractedAttribute, SourceDocument
 from app.domain.units import normalize
 from app.pipeline.citation.service import verify
 from app.pipeline.contradiction.service import contradictions
-from app.pipeline.entity_resolution.service import clusters
+from app.pipeline.entity_resolution.service import clusters, mpn_similarity
 from app.pipeline.validation.service import validate
 from app.seed import load_seed_documents
 from app.llm.fixture import SeedFixtureExtractionProvider
@@ -36,3 +36,7 @@ def test_lsh_reduces_comparisons_for_large_catalog():
     _, compared=clusters(records, embedding_similarity=lambda i,j: 1.0 if i==j else 0.0)
     assert compared < 1000*999//2
     test_boundaries()
+
+def test_mpn_series_numbers_do_not_overcluster():
+    assert mpn_similarity('UC201','UC202') == 0
+    assert mpn_similarity('K20-024','000K20 024') == 1
