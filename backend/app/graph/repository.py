@@ -5,7 +5,7 @@ from app.domain.models import Product, SourceDocument, ExtractedAttribute
 
 class GraphRepository:
     def __init__(self, uri: str | None = None, username: str | None = None, password: str | None = None):
-        self.driver = GraphDatabase.driver(uri or os.getenv("NEO4J_URI", "bolt://localhost:7687"), auth=(username or os.getenv("NEO4J_USERNAME", "neo4j"), password or os.getenv("NEO4J_PASSWORD", "password")))
+        self.driver = GraphDatabase.driver(uri or os.getenv("NEO4J_URI", "bolt://localhost:7687"), auth=(username or os.getenv("NEO4J_USERNAME", "neo4j"), password or os.getenv("NEO4J_PASSWORD", "change-me")))
     def close(self): self.driver.close()
     def check(self) -> bool:
         try:
