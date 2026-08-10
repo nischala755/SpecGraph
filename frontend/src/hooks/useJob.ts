@@ -1,0 +1,2 @@
+import {useEffect,useState} from 'react'; import {api,Job} from '../api/client';
+export function useJob(id?:string){const [job,setJob]=useState<Job>();const [error,setError]=useState<string>();useEffect(()=>{if(!id)return;let live=true;let timer:number;const poll=async()=>{try{const next=await api.job(id);if(live)setJob(next);if(!['completed','failed'].includes(next.state))timer=window.setTimeout(poll,2000)}catch(e){if(live)setError(e instanceof Error?e.message:'Unable to retrieve job state')}};poll();return()=>{live=false;clearTimeout(timer)}},[id]);return{job,error}}
