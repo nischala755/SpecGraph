@@ -295,6 +295,8 @@ The deployment is a single Docker web service: FastAPI serves the compiled React
 4. Deploy, then open `/health`. It must report `neo4j: "connected"` and `mistral_configured: true`.
 5. For the free hosted demo, seed AuraDB once from a local machine, then set `SPECGRAPH_READ_ONLY_DEMO=true`. The deployed workbench remains fully verifiable while avoiding local embedding inference on the constrained host.
 
+For a time-constrained free demo seed, `SPECGRAPH_EMBEDDING_BACKEND=lexical` is an explicit deterministic mode for the fixed seed corpus; it preserves the MinHash/MPN/category resolution path and real extraction, citation, contradiction, validation, and provenance stages. The default production resolver remains local ONNX MiniLM.
+
 `render.yaml` enables deployment from commits on `main`. Render Free can sleep after inactivity, so allow a cold-start request before a presentation.
 
 ## Security and operating notes

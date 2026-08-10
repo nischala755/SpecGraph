@@ -14,12 +14,14 @@ def _mh(text: str) -> MinHash:
     return m
 def _semantic_scores(candidates: list[Candidate]) -> Callable[[int, int], float]:
     """Local CPU all-MiniLM-L6-v2 inference; invoked only after LSH pruning."""
+    backend=os.getenv("SPECGRAPH_EMBEDDING_BACKEND", "onnx")
+    if backend=="lexical":
+        return lambda i, j: ratio(norm(candidates[i].product_name),norm(candidates[j].product_name))/100
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     os.environ.setdefault("OMP_NUM_THREADS", "1")
     os.environ.setdefault("MKL_NUM_THREADS", "1")
     from sentence_transformers import SentenceTransformer
     # ONNX keeps the required MiniLM model local/CPU-based while fitting a free web instance.
-    backend=os.getenv("SPECGRAPH_EMBEDDING_BACKEND", "onnx")
     model_kwargs={"file_name": "onnx/model.onnx", "provider": "CPUExecutionProvider"} if backend=="onnx" else {}
     model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu", backend=backend, model_kwargs=model_kwargs)
     model.max_seq_length = 64
