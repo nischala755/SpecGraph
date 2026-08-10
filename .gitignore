@@ -5,3 +5,5 @@ __pycache__/
 .venv/
 frontend/node_modules/
 frontend/dist/
+frontend/tsconfig.tsbuildinfo
+/package-lock.json
