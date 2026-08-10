@@ -78,7 +78,7 @@ LLM boundary
 1. **Ingest** — source text receives a deterministic SHA-256 `SourceDocument.id`; duplicate content upserts instead of duplicating.
 2. **Extract** — the document is split into bounded chunks and Mistral returns a strict JSON claim schema. `MISTRAL_MODEL` is configurable; the LLM is not a fallback source of truth.
 3. **Verify citation** — `rapidfuzz.token_sort_ratio` compares each claimed citation to its source chunk. A score of `≥ 90` is verified. Failed verification retains both the claimed span and nearest actual source text.
-4. **Resolve identity** — character-trigram MinHash LSH generates candidates before any scoring. Candidate pairs are scored with local CPU `all-MiniLM-L6-v2` embeddings (55%), normalized MPN fuzziness (30%), and category match (15%). The cluster threshold is `0.78`.
+4. **Resolve identity** — character-trigram MinHash LSH generates candidates before any scoring. Candidate pairs are scored with local CPU ONNX `all-MiniLM-L6-v2` embeddings (55%), normalized MPN fuzziness (30%), and category match (15%). The cluster threshold is `0.78`.
 5. **Normalize units** — supported length, power, voltage, current, resistance, density, and melting-point conversions are expressed in explicit Python mappings; mismatched unit families become an explainable invalid state.
 6. **Adjudicate disagreement** — numeric values within 2% are equivalent; values outside it create `CONTRADICTS` relationships. Text values use punctuation/case/whitespace normalization. Nothing is averaged or discarded.
 7. **Validate physics** — independent rules check `P = VI`, `V = IR`, bore vs. outer diameter, positive dimensions, total-length ordering, unit families, and a reference table of industrial materials.

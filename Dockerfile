@@ -8,7 +8,7 @@ RUN npm run build
 FROM python:3.12-slim
 WORKDIR /app
 COPY backend/pyproject.toml ./
-RUN pip install --no-cache-dir fastapi "uvicorn[standard]" neo4j pydantic httpx rapidfuzz datasketch sentence-transformers
+RUN pip install --no-cache-dir fastapi "uvicorn[standard]" neo4j pydantic httpx rapidfuzz datasketch "sentence-transformers[onnx]"
 COPY backend/app ./app
 COPY seed ./seed
 COPY --from=frontend /frontend/dist ./static

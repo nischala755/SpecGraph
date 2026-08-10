@@ -15,8 +15,11 @@ def _mh(text: str) -> MinHash:
 def _semantic_scores(candidates: list[Candidate]) -> Callable[[int, int], float]:
     """Local CPU all-MiniLM-L6-v2 inference; invoked only after LSH pruning."""
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+    os.environ.setdefault("OMP_NUM_THREADS", "1")
+    os.environ.setdefault("MKL_NUM_THREADS", "1")
     from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
+    # ONNX keeps the required MiniLM model local/CPU-based while fitting a free web instance.
+    model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu", backend="onnx", model_kwargs={"file_name": "onnx/model.onnx", "provider": "CPUExecutionProvider"})
     model.max_seq_length = 64
     vectors = model.encode([f"{c.product_name} {c.category}" for c in candidates], batch_size=1, normalize_embeddings=True, show_progress_bar=False)
     del model
