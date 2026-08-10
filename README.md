@@ -293,7 +293,7 @@ The deployment is a single Docker web service: FastAPI serves the compiled React
    ```
 
 4. Deploy, then open `/health`. It must report `neo4j: "connected"` and `mistral_configured: true`.
-5. Trigger **Reset demo dataset** from the application to populate AuraDB through the same pipeline used for ingestion.
+5. For the free hosted demo, seed AuraDB once from a local machine, then set `SPECGRAPH_READ_ONLY_DEMO=true`. The deployed workbench remains fully verifiable while avoiding local embedding inference on the constrained host.
 
 `render.yaml` enables deployment from commits on `main`. Render Free can sleep after inactivity, so allow a cold-start request before a presentation.
 

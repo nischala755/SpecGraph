@@ -26,5 +26,7 @@ async def product(product_id:str,request:Request):
 async def graph(product_id:str,request:Request): return request.app.state.repo.graph(product_id)
 @router.post('/demo/reset')
 async def reset(request:Request):
+    if request.app.state.read_only_demo:
+        raise HTTPException(409,'This hosted demo serves a precomputed, provenance-verified dataset. Reset is disabled to protect the free deployment; run ingestion locally to refresh it.')
     try: request.app.state.repo.clear(); docs=request.app.state.seed_documents(); return request.app.state.jobs.start(docs).payload()
     except Exception as e:raise HTTPException(503,f'Demo reset failed: {e}')

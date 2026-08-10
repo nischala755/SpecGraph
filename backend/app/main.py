@@ -20,10 +20,10 @@ async def lifespan(app):
     repo=GraphRepository(); app.state.startup_error=None
     try: repo.initialize()
     except Exception as error: app.state.startup_error=f"Neo4j initialization failed: {error}"
-    app.state.repo=repo;app.state.seed_documents=load_seed_documents
+    app.state.repo=repo;app.state.seed_documents=load_seed_documents;app.state.read_only_demo=os.getenv('SPECGRAPH_READ_ONLY_DEMO','').lower()=='true'
     app.state.jobs=JobManager(IngestionService(repo,provider_for).process,repo);yield;repo.close()
 app=FastAPI(title='SpecGraph Intelligence Engine',lifespan=lifespan);app.include_router(router)
 @app.get('/health')
 async def health():
-    connected=app.state.repo.check();return JSONResponse({"status":"ok" if connected else "degraded","neo4j":"connected" if connected else "disconnected","mistral_configured":bool(os.getenv('MISTRAL_API_KEY'))},status_code=200 if connected else 503)
+    connected=app.state.repo.check();return JSONResponse({"status":"ok" if connected else "degraded","neo4j":"connected" if connected else "disconnected","mistral_configured":bool(os.getenv('MISTRAL_API_KEY')),"demo_mode":"read_only" if app.state.read_only_demo else "interactive"},status_code=200 if connected else 503)
 if os.path.isdir('static'): app.mount('/',StaticFiles(directory='static',html=True),name='static')

@@ -19,7 +19,9 @@ def _semantic_scores(candidates: list[Candidate]) -> Callable[[int, int], float]
     os.environ.setdefault("MKL_NUM_THREADS", "1")
     from sentence_transformers import SentenceTransformer
     # ONNX keeps the required MiniLM model local/CPU-based while fitting a free web instance.
-    model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu", backend="onnx", model_kwargs={"file_name": "onnx/model.onnx", "provider": "CPUExecutionProvider"})
+    backend=os.getenv("SPECGRAPH_EMBEDDING_BACKEND", "onnx")
+    model_kwargs={"file_name": "onnx/model.onnx", "provider": "CPUExecutionProvider"} if backend=="onnx" else {}
+    model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu", backend=backend, model_kwargs=model_kwargs)
     model.max_seq_length = 64
     vectors = model.encode([f"{c.product_name} {c.category}" for c in candidates], batch_size=1, normalize_embeddings=True, show_progress_bar=False)
     del model
