@@ -38,7 +38,7 @@ class GraphRepository:
             for c in product.contradictions:
                 s.run("MATCH (a:AttributeValue {id:$left}),(b:AttributeValue {id:$right}) MERGE (a)-[r:CONTRADICTS]->(b) SET r.resolution_status=$status,r.reason=$reason",left=c["left"],right=c["right"],status=c["resolution_status"],reason=c["reason"])
     def products(self, search: str | None = None) -> list[dict]:
-        query="MATCH (p:Product) OPTIONAL MATCH (p)-[:RESOLVED_FROM]->(d) OPTIONAL MATCH (p)-[:HAS_ATTRIBUTE]->(a) WITH p, count(DISTINCT d) AS sources, collect(DISTINCT a) AS attrs OPTIONAL MATCH (p)-[:HAS_ATTRIBUTE]->(x)-[:CONTRADICTS]-() WITH p,sources,attrs,count(DISTINCT x) AS contradictions RETURN p{.*},sources,contradictions, any(a IN attrs WHERE a.plausibility_status='implausible') AS implausible, any(a IN attrs WHERE a.citation_verified=false) AS unverified ORDER BY p.resolved_name"
+        query="MATCH (p:Product) OPTIONAL MATCH (p)-[:RESOLVED_FROM]->(d) OPTIONAL MATCH (p)-[:HAS_ATTRIBUTE]->(a) WITH p, count(DISTINCT d) AS sources, collect(DISTINCT a) AS attrs OPTIONAL MATCH (p)-[:HAS_ATTRIBUTE]->(x)-[:CONTRADICTS]-() WITH p,sources,attrs,count(DISTINCT x) AS contradictions RETURN p{.*},sources,attrs,contradictions, any(a IN attrs WHERE a.plausibility_status='implausible') AS implausible, any(a IN attrs WHERE a.citation_verified=false) AS unverified ORDER BY p.resolved_name"
         with self._session() as s:
             rows=[dict(r) for r in s.run(query)]
         if search:
